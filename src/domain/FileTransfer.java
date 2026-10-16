@@ -3,6 +3,15 @@ package domain;
 import java.io.IOException;
 
 public interface FileTransfer {
-    public  MetadatosFichero receiveMeta() throws IOException;
-    public void receiveBody(MetadatosFichero fichero,String directory) throws IOException;
+    public void sendPeticioAuth(PeticionAuth peticionAuth) throws IOException;
+
+    public RespuestaAuth receiveRespuestaAuth() throws IOException, ClassNotFoundException;
+
+    public void sendMetaDatos(MetadatosFichero metadatosFichero) throws IOException;
+
+    public RespuestaMetadatos receiveRespuestaMetadatos() throws IOException, ClassNotFoundException;
+
+    public void SendBody(MetadatosFichero metadatosFichero, String directory) throws IOException;
+
+
 }
