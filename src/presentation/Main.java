@@ -3,6 +3,8 @@ package presentation;
 import data.TransferSockets;
 import domain.MetadatosFichero;
 import domain.PeticionAuth;
+import domain.RespuestaAuth;
+import domain.RespuestaMetadatos;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,41 +48,62 @@ public class Main {
         System.out.println("opcion2 : Salir");
     }
 
-    public static void conectarEnviar(Scanner sc){
+    public static void conectarEnviar(Scanner sc) {
 
         System.out.println("introduce el usuario :");
         String usuario = sc.nextLine();
         System.out.println("introduce la contraseña :");
         String contrasenia = sc.nextLine();
 
-        try(Socket socket=new Socket("localhost",16000)){
-            TransferSockets transfer=new TransferSockets(socket);
-            PeticionAuth peticionAuth=new PeticionAuth(usuario,contrasenia);
+        try (Socket socket = new Socket("localhost", 16000)) {
+            System.out.println("esperando al servidor:..............");
+            TransferSockets transfer = new TransferSockets(socket);
+            PeticionAuth peticionAuth = new PeticionAuth(usuario, contrasenia);
             transfer.sendPeticioAuth(peticionAuth);
+            System.out.println("enviando peticion auth al sevidor (ususario,contraseña)...........");
 
             try {
-                transfer.receiveRespuestaAuth();
+
+                RespuestaAuth respuestaAuth = transfer.receiveRespuestaAuth();
+                if (respuestaAuth.isExito()) {
+                    System.out.println("envio terminado con exito,recebimos un respuesta");
+                    System.out.println("introduce la ruta del fichero que quieres subir");
+                    String ruta = sc.nextLine();
+
+                    File file = new File(ruta);
+                    if (file.exists()) {
+
+                        MetadatosFichero metadatosFichero = new MetadatosFichero(file.getName(), file.length());
+                        transfer.sendMetaDatos(metadatosFichero);
+                        System.out.println("enviando los meta datos del fichero que queremos enviar");
+                        try {
+                            RespuestaMetadatos respuestaMetadatos = transfer.receiveRespuestaMetadatos();
+                            if (respuestaMetadatos.isAceptado()) {
+                                System.out.println("envio terminado con exito, recebimos la respuesta");
+                                transfer.SendBody(metadatosFichero, "./ficheros");
+                                System.out.println("enviando el archiv al servidor");
+
+                            } else {
+                                System.out.println("los metadatos que hemos enviado están mal");
+                            }
+
+
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        System.out.println("el archivo no existe ");
+                    }
+
+                } else {
+                    System.out.println("las credenciales está mal ");
+
+
+                }
+
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
-
-
-            System.out.println("introduce la ruta del fichero que quieres subir");
-            String ruta=sc.nextLine();
-
-            File file=new File(ruta);
-
-            MetadatosFichero metadatosFichero=new MetadatosFichero(file.getName(),file.length());
-            transfer.sendMetaDatos(metadatosFichero);
-
-
-            try {
-                transfer.receiveRespuestaMetadatos();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-
 
 
         } catch (UnknownHostException e) {

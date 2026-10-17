@@ -44,7 +44,7 @@ public class TransferSockets implements FileTransfer {
     @Override
     public void SendBody(MetadatosFichero metadatosFichero, String directory) throws IOException {
         byte[] buffer = new byte[8 * 1024];
-        File file = new File(directory, metadatosFichero.getNombre());
+        File file = new File(directory+File.separator+ metadatosFichero.getNombre());
         int longitud = 0;
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             while ((longitud = fileInputStream.read(buffer, 0, buffer.length)) != -1) {
