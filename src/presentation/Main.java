@@ -1,10 +1,10 @@
 package presentation;
 
 import data.TransferSockets;
-import domain.MetadatosFichero;
-import domain.PeticionAuth;
-import domain.RespuestaAuth;
-import domain.RespuestaMetadatos;
+import domain.model.MetadatosFichero;
+import domain.model.PeticionAuth;
+import domain.model.RespuestaAuth;
+import domain.model.RespuestaMetadatos;
 
 import java.io.File;
 import java.io.IOException;
